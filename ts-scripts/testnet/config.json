@@ -1,0 +1,20 @@
+{
+  "chains": [
+    {
+      "description": "Avalanche testnet fuji",
+      "chainId": 6,
+      "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
+      "tokenBridge": "0x61E44E506Ca5659E6c0bba9b678586fA2d729756",
+      "wormholeRelayer": "0xA3cF45939bD6260bcFe3D66bc73d60f19e49a8BB",
+      "wormhole": "0x7bbcE28e64B3F8b84d876Ab298393c38ad7aac4C"
+    },
+    {
+      "description": "Polygon Testnet",
+      "chainId": 5,
+      "rpc": "https://polygon-mumbai.g.alchemy.com/v2/zvHiRctLU05rjtA-c4rVIqygGk2NhAu4",
+      "tokenBridge": "0x377D55a7928c046E18eEbb61977e714d2a76472a",
+      "wormholeRelayer": "0x0591C25ebd0580E0d4F27A82Fc2e24E7489CB5e0",
+      "wormhole": "0x0CBE91CF822c73C2315FB05100C2F714765d5c20"
+    }
+  ]
+}
