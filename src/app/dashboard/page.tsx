@@ -1,15 +1,15 @@
 "use client";
 
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
 import {
   useAddress,
   useChain,
   useDisconnect,
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
-import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {toast} from "@/components/ui/use-toast";
-import {generate} from "random-words";
+import { toast } from "@/components/ui/use-toast";
+import { generate } from "random-words";
 
 export default function Dashboard() {
   const chain = useChain();
@@ -30,11 +30,11 @@ export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
   const [words, setWords] = useState("");
   const [boxes, setBoxes] = useState([]);
-  const [wordToGuess, setWordToGuess] = useState("");
+  const [wordToGuess, setWordToGuess] = useState<any>("");
   const [currentGuess, setCurrentGuess] = useState("");
   const [turn, setTurn] = useState(0);
-  const [winner, setWinner] = useState(null);
-  const [ans, setAns] = useState("");
+  const [winner, setWinner] = useState<String | null>(null);
+  const [ans, setAns] = useState<any>("");
 
   useEffect(() => {
     if (!address) {
@@ -54,8 +54,8 @@ export default function Dashboard() {
     });
   };
 
-  const createBoxes = (word) => {
-    const boxArray = word.split("").map((letter) => ({
+  const createBoxes = (word: any) => {
+    const boxArray = word.split("").map((letter: any) => ({
       letter,
       isRevealed: false,
     }));
@@ -77,12 +77,12 @@ export default function Dashboard() {
     const isCorrect = currentGuess === wordToGuess;
     if (isCorrect) {
       setWinner(turn);
-      setBoxes((prevBoxes) =>
-        prevBoxes.map((box) => ({...box, isRevealed: true}))
+      setBoxes((prevBoxes: any) =>
+        prevBoxes.map((box: any) => ({ ...box, isRevealed: true }))
       );
     } else {
       setBoxes((prevBoxes) =>
-        prevBoxes.map((box) => ({...box, isRevealed: false}))
+        prevBoxes.map((box) => ({ ...box, isRevealed: false }))
       );
       setTurn(turn === 0 ? 1 : 0);
     }
@@ -97,6 +97,7 @@ export default function Dashboard() {
 
   return (
     <div className="h-screen w-screen flex justify-center items-center flex-col">
+      <p>{chain && chain.chain}</p>
       <div className="absolute top-5 right-10">
         <div className="flex space-x-5">
           <DropdownMenu>

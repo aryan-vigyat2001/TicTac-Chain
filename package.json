@@ -18,6 +18,7 @@
     "@thirdweb-dev/sdk": "^3.10.62",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "dotenv": "^16.3.1",
     "ethers": "^5.7.2",
     "fs": "^0.0.1-security",
     "lucide-react": "^0.279.0",
