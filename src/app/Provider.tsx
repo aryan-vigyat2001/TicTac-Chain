@@ -16,6 +16,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ReactNode } from "react";
 import { type ThemeProviderProps } from "next-themes/dist/types"
 import { AvalancheFuji, Mumbai } from "@thirdweb-dev/chains";
+import DBContextProvider, { DBContext } from "@/context/DBContext";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     return (
@@ -38,7 +39,9 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
                 phantomWallet(),
             ]}
         >
-            <NextThemesProvider {...props}>{children}</NextThemesProvider>
+            <DBContextProvider>
+                <NextThemesProvider {...props}>{children}</NextThemesProvider>
+            </DBContextProvider>
         </ThirdwebProvider>
     );
 }

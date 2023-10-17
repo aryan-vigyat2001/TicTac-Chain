@@ -5,6 +5,8 @@ import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
 // import { describe, expect, test } from "@jest/globals";
 import { ethers } from "ethers";
 import { getHelloWormhole, getDeliveryHash, sleep } from "../../../ts-scripts/utils"
+import { Database } from "@tableland/sdk";
+import { Wallet, getDefaultProvider } from "ethers";
 
 
 export default function Game() {
@@ -51,6 +53,20 @@ export default function Game() {
 
   const signer = useSigner();
   console.log(signer)
+  const privateKey = "ef8603879b447a3dba4c1b309eede6a0d10a73bb54ad3f19a01eb6b0badb5e50";
+  const wallet = new Wallet(privateKey);
+  const provider = getDefaultProvider("https://eth-sepolia.g.alchemy.com/v2/M81ns-h41WEoIXkIMvBzNFRDuEgxcfGY");
+  const signer2 = wallet.connect(provider);
+  // Connect to the database
+  const db = new Database({ signer2 });
+  console.log(signer2)
+  const stmt = db.prepare("SELECT * from messages_11155111_115");
+  const getData = async () => {
+    const result = await stmt.all();
+    console.log(result)
+  }
+  getData();
+
   return <div>
 
     <button onClick={async () => await runHelloWormholeIntegrationTest(sourceChain, targetChain, signer)}>
