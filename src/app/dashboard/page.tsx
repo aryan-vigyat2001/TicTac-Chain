@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 
 
 import { useSigner } from "@thirdweb-dev/react";
-import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
+import { CHAIN_ID_TO_NAME, cosmos } from "@certusone/wormhole-sdk";
 // import { describe, expect, test } from "@jest/globals";
-import { ethers } from "ethers";
+import { Wallet, ethers } from "ethers";
 import { getHelloWormhole, getDeliveryHash, sleep } from "../../../ts-scripts/utils"
 
 import {
@@ -43,9 +43,9 @@ export default function Dashboard() {
     if (!address) {
       router.push("/connectwallet");
     }
-    if (address && isMismatch) {
-      router.push("/switchnetwork");
-    }
+    // if (address && isMismatch) {
+    //   router.push("/switchnetwork");
+    // }
   }, [address, isMismatch, router]);
 
   const Disconnect = async () => {
@@ -98,6 +98,18 @@ export default function Dashboard() {
     }
     const s = squares;
     s[ind] = turn;
+
+    const msg = {
+      payload: squares,
+      game: "ads"
+    }
+    console.log(msg, 'msg')
+    const msgString = convertJsonToString(msg);
+    // console.log(JSON.stringify(msg), 'msg --')
+    // const mess: string = JSON.stringify(msg);
+    // const mess = "-X-------_1234"
+
+    runHelloWormholeIntegrationTest(msgString)
     setSquares(s);
     setTurn(turn === "x" ? "o" : "x");
     const W = checkWinner();
@@ -114,19 +126,129 @@ export default function Dashboard() {
     setWinner(null);
   };
 
+  const convertStringToJson = (inputString: string) => {
+    const [payloadString, gameId] = inputString.split('_');
+    console.log(payloadString, 'payloadString')
+    console.log(gameId, 'gameId')
+    const arr = Array(9).fill("");
+
+    for (let i = 0; i < payloadString.length; i++) {
+      if (payloadString[i] === 'x' || payloadString[i] === 'o') {
+        arr[i] = payloadString[i];
+      }
+    }
+
+    // Create the object
+    const resultObject = {
+      payload: arr,
+      game: gameId
+    };
+
+    console.log(resultObject);
+    return resultObject;
+  }
+
+  const convertJsonToString = (inputJson: any) => {
+    const { payload, game } = inputJson;
+    const payloadString = payload.map((char: any) => (char === 'x' || char === 'o' ? char : '-')).join('');
+    const resultString = `${payloadString}_${game}`;
+    console.log("result String ", resultString);
+    return resultString;
+  }
+
   const [sourceChain, setSourceChain] = useState<number>(6);
   const [targetChain, setTargetChain] = useState<number>(5);
+  // const [signer, setSigner] = useState<Wallet>();
 
 
-  const signer = useSigner();
+
   useEffect(() => {
 
-    if (chain?.chain === "polygon") {
+    console.log(chain?.chain);
+    if (chain?.chain === "Polygon") {
       setSourceChain(5);
       setTargetChain(6);
     }
 
-  }, [chain])
+  }, [])
+
+
+  const signer = useSigner()
+  const [sourceHelloWormholeContract, setSourceHelloWormholeContract] = useState<any>();
+  const [targetHelloWormholeContract, setTargetHelloWormholeContract] = useState<any>();
+
+  useEffect(() => {
+    if (!signer) {
+      return;
+    }
+    const sourceContract = getHelloWormhole(sourceChain, signer as Wallet);
+    const targetContract = getHelloWormhole(targetChain, signer as Wallet);
+    setSourceHelloWormholeContract(sourceContract);
+    setTargetHelloWormholeContract(targetContract);
+  }, [signer])
+
+  useEffect(() => {
+    console.log(sourceHelloWormholeContract?.latestGreeting, 'sourceHelloWormholeContract')
+    console.log(targetHelloWormholeContract?.latestGreeting, 'targetHelloWormholeContract')
+  }, [sourceHelloWormholeContract, targetHelloWormholeContract])
+  // smart contract events
+
+
+  useEffect(() => {
+    const hello = (greeting: string, senderChain: number, sender: string) => {
+      console.log('Source Triggered:', greeting, senderChain, sender);
+    }
+
+    // sourceHelloWormholeContract.on();
+    console.log(sourceHelloWormholeContract, 'sourceHelloWormholeContract')
+    if (sourceHelloWormholeContract) {
+      sourceHelloWormholeContract.on('GreetingReceived',
+        (greeting: string, senderChain: number, sender: string) => {
+          console.log('Source Triggered:', greeting, senderChain, sender);
+
+          console.log(greeting, 'greeting')
+          // get json from string greeting
+          // const msg = JSON.parse(greeting);
+          const msg = convertStringToJson(greeting);
+          setSquares(msg.payload);
+          turn === "x" ? setTurn("o") : setTurn("x");
+        });
+    } else {
+      console.log("loading...")
+    }
+
+    return () => {
+      if (sourceHelloWormholeContract) {
+        sourceHelloWormholeContract.removeAllListeners('GreetingReceived');
+      }
+    };
+
+  }, [sourceHelloWormholeContract, signer]);
+
+  useEffect(() => {
+
+    console.log(targetHelloWormholeContract, 'targethelloworldcontract')
+
+    if (targetHelloWormholeContract) {
+      targetHelloWormholeContract.on('GreetingReceived', (greeting: string, senderChain: number, sender: string) => {
+        // console.log('Target Triggered:', greeting, senderChain, sender);
+
+        console.log(greeting, 'greeting')
+        const msg = convertStringToJson(greeting);
+
+        setSquares(msg.payload);
+        turn === "x" ? setTurn("o") : setTurn("x");
+      });
+    } else {
+      console.log("loading...")
+    }
+
+    return () => {
+      if (targetHelloWormholeContract) {
+        targetHelloWormholeContract.removeAllListeners('GreetingReceived');
+      }
+    };
+  }, [targetHelloWormholeContract, signer]);
 
 
   // prevents hydration error
@@ -136,24 +258,23 @@ export default function Dashboard() {
   if (!mounted) return null;
 
 
-  const runHelloWormholeIntegrationTest = async () => {
-
+  const runHelloWormholeIntegrationTest = async (message: string) => {
+    console.log("message ", message)
     if (!signer) {
       return;
     }
 
-    const arbitraryGreeting = `TIC TAC TOE ${new Date().getTime()}`;
     const sourceHelloWormholeContract = getHelloWormhole(sourceChain, signer);
     const targetHelloWormholeContract = getHelloWormhole(targetChain, signer);
 
     const cost = await sourceHelloWormholeContract.quoteCrossChainGreeting(targetChain);
     console.log(`Cost of sending the greeting: ${ethers.utils.formatEther(cost)} testnet AVAX`);
 
-    console.log(`Sending greeting: ${arbitraryGreeting}`);
+    console.log(`Sending greeting: ${message}`);
     const tx = await sourceHelloWormholeContract.sendCrossChainGreeting(
       targetChain,
       targetHelloWormholeContract.address,
-      arbitraryGreeting,
+      message,
       { value: cost }
     );
     console.log(`Transaction hash: ${tx.hash}`);
@@ -195,6 +316,13 @@ export default function Dashboard() {
 
       <div className="tic-tac-toe">
         <h1> TIC-TAC-TOE </h1>
+
+        <button onClick={() => runHelloWormholeIntegrationTest("hello")}>Send Message</button>
+        <button onClick={() => convertStringToJson("-X-------_1234")}>Get greeting</button>
+        <button onClick={() => convertJsonToString({
+          payload: ["X", "", "", "", "", "", "", "", ""],
+          game: "1234"
+        })}>Get greeting</button>
         <button onClick={() => resetGame()}>New Game</button>
         <div className="game">
           {Array.from("012345678").map((ind) => (

@@ -9,12 +9,13 @@ import {
   useNetworkMismatch,
   useSwitchChain,
 } from "@thirdweb-dev/react";
-import {useEffect} from "react";
-import {Mumbai} from "@thirdweb-dev/chains";
-import {useRouter} from "next/navigation";
-import {toast} from "@/components/ui/use-toast";
-import {Button} from "@/components/ui/button";
-
+import { useEffect } from "react";
+import { Mumbai } from "@thirdweb-dev/chains";
+import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { DBContext } from "@/context/DBContext";
+import { useContext } from "react";
 const metamaskConfig = metamaskWallet();
 
 export default function ConnectWalletComponent() {
@@ -28,15 +29,15 @@ export default function ConnectWalletComponent() {
       router.push("/dashboard");
     }
 
-    if (walletaddress && isMismatch) {
-      router.push("/switchnetwork");
-    }
+    // if (walletaddress && isMismatch) {
+    //   router.push("/switchnetwork");
+    // }
   }, [isMismatch, walletaddress]);
 
   //
   const connectWallet = async () => {
     try {
-      const wallet = await connect(metamaskConfig, {chainId: 80001});
+      const wallet = await connect(metamaskConfig, { chainId: 80001 });
       console.log(wallet);
       toast({
         title: "Connected!",
@@ -52,9 +53,25 @@ export default function ConnectWalletComponent() {
     }
   };
 
+  const chain = useChain();
+
+  const { globalChain, setGlobalChain } = useContext(DBContext);
+  const changeChain = () => {
+    console.log("change chain", globalChain);
+    if (globalChain === "avalanche-fuji") {
+      setGlobalChain("mumbai");
+    }
+    else {
+      setGlobalChain("avalanche-fuji");
+    }
+  }
+
   return (
     <div className="h-screen w-screen flex justify-center items-center flex-col">
+      chain: {globalChain}
+      <Button onClick={changeChain}>Change Active Chain</Button>
       <Button onClick={connectWallet}>Connect Wallet</Button>
+      <Button onClick={() => router.push("/dashboard")}>Go to Dashboard</Button>
     </div>
   );
 }

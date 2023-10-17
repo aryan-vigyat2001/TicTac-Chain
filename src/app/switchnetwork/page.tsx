@@ -1,15 +1,15 @@
 "use client";
 
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   useAddress,
   useNetwork,
   useNetworkMismatch,
   useSwitchChain,
 } from "@thirdweb-dev/react";
-import {Mumbai} from "@thirdweb-dev/chains";
-import {useEffect} from "react";
-import {useRouter} from "next/navigation";
+import { Mumbai } from "@thirdweb-dev/chains";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SwitchNetwork() {
   const switchChain = useSwitchChain();

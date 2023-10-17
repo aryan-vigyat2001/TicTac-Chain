@@ -1,5 +1,5 @@
 "use client"
-import { ReactNode, createContext } from "react"
+import { ReactNode, createContext, useState } from "react"
 import { Database } from "@tableland/sdk";
 export const DBContext = createContext({})
 import { Wallet, getDefaultProvider } from "ethers";
@@ -8,10 +8,12 @@ const DBContextProvider = ({ children }: { children: ReactNode }) => {
     const wallet = new Wallet(privateKey);
     const provider = getDefaultProvider("https://eth-sepolia.g.alchemy.com/v2/M81ns-h41WEoIXkIMvBzNFRDuEgxcfGY");
     const signer2 = wallet.connect(provider);
-    // Connect to the database
     const db = new Database({ signer2 });
+
+    const [globalChain, setGlobalChain] = useState("avalanche-fuji");
+    // Connect to the database
     return (
-        <DBContext.Provider value={{ db }}>
+        <DBContext.Provider value={{ db, globalChain, setGlobalChain }}>
             {children}
         </DBContext.Provider>
     )

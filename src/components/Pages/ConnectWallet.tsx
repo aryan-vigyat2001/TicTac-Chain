@@ -9,11 +9,11 @@ import {
   useNetworkMismatch,
   useSwitchChain,
 } from "@thirdweb-dev/react";
-import {useEffect} from "react";
-import {Button} from "../ui/button";
-import {toast} from "../ui/use-toast";
-import {Mumbai} from "@thirdweb-dev/chains";
-import {useRouter} from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "../ui/button";
+import { toast } from "../ui/use-toast";
+import { Mumbai } from "@thirdweb-dev/chains";
+import { useRouter } from "next/navigation";
 
 const metamaskConfig = metamaskWallet();
 
@@ -31,15 +31,15 @@ export default function ConnectWalletComponent() {
       router.push("/dashboard");
     }
 
-    if (walletaddress && isMismatch) {
-      router.push("/switchnetwork");
-    }
+    // if (walletaddress && isMismatch) {
+    //   router.push("/switchnetwork");
+    // }
   }, [isMismatch, walletaddress]);
 
   //
   const connectWallet = async () => {
     try {
-      const wallet = await connect(metamaskConfig, {chainId: 80001});
+      const wallet = await connect(metamaskConfig, { chainId: 80001 });
       console.log(wallet);
       toast({
         title: "Connected!",
