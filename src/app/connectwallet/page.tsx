@@ -9,13 +9,13 @@ import {
   useNetworkMismatch,
   useSwitchChain,
 } from "@thirdweb-dev/react";
-import { useEffect } from "react";
-import { Mumbai } from "@thirdweb-dev/chains";
-import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { DBContext } from "@/context/DBContext";
-import { useContext } from "react";
+import {useEffect} from "react";
+import {Mumbai} from "@thirdweb-dev/chains";
+import {useRouter} from "next/navigation";
+import {toast} from "@/components/ui/use-toast";
+import {Button} from "@/components/ui/button";
+import {DBContext} from "@/context/DBContext";
+import {useContext} from "react";
 const metamaskConfig = metamaskWallet();
 
 export default function ConnectWalletComponent() {
@@ -37,7 +37,7 @@ export default function ConnectWalletComponent() {
   //
   const connectWallet = async () => {
     try {
-      const wallet = await connect(metamaskConfig, { chainId: 80001 });
+      const wallet = await connect(metamaskConfig, {chainId: 80001});
       console.log(wallet);
       toast({
         title: "Connected!",
@@ -55,16 +55,17 @@ export default function ConnectWalletComponent() {
 
   const chain = useChain();
 
-  const { globalChain, setGlobalChain } = useContext(DBContext);
+  const {globalChain, setGlobalChain, setGlobalTurn} = useContext(DBContext);
   const changeChain = () => {
     console.log("change chain", globalChain);
     if (globalChain === "avalanche-fuji") {
       setGlobalChain("mumbai");
-    }
-    else {
+      setGlobalTurn("x");
+    } else {
       setGlobalChain("avalanche-fuji");
+      setGlobalTurn("o");
     }
-  }
+  };
 
   return (
     <div className="h-screen w-screen flex justify-center items-center flex-col">
