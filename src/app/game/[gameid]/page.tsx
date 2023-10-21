@@ -287,7 +287,8 @@ const GameId = ({ params }: { params: any }) => {
           const msg = convertStringToJson(greeting);
           setSquares(msg.payload);
           console.log(turn, "at source");
-          turn === "x" ? setTurn("o") : setTurn("x");
+          // globalTurn === "x" ? setTurn("o") : setTurn("x");
+          setTurn(globalTurn)
         }
       );
     } else {
@@ -316,7 +317,8 @@ const GameId = ({ params }: { params: any }) => {
 
           setSquares(msg.payload);
           console.log(turn, "at dest");
-          turn === "x" ? setTurn("o") : setTurn("x");
+          // globalTurn === "x" ? setTurn("o") : setTurn("x");
+          setTurn(globalTurn)
         }
       );
     } else {
