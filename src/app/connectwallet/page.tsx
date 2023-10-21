@@ -58,11 +58,11 @@ export default function ConnectWalletComponent() {
   const { globalChain, setGlobalChain, setGlobalTurn } = useContext(DBContext);
   const changeChain = () => {
     console.log("change chain", globalChain);
-    if (globalChain === "celo-alfajores-testnet") {
+    if (globalChain === "avalanche-fuji") {
       setGlobalChain("mumbai");
       setGlobalTurn("x");
     } else {
-      setGlobalChain("celo-alfajores-testnet");
+      setGlobalChain("avalanche-fuji");
       setGlobalTurn("o");
     }
   };

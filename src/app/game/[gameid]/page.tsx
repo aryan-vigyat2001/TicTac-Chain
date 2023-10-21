@@ -1,7 +1,7 @@
 "use client";
 import useDB from "@/hooks/useDB";
-import { useAddress } from "@thirdweb-dev/react";
 import { Router } from "lucide-react";
+import { useAddress } from "@thirdweb-dev/react";
 import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,6 +33,7 @@ import Square from "../../../components/Square";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "@/components/ui/use-toast";
 
+
 const GameId = ({ params }: { params: any }) => {
   const { db, globalTurn, setGlobalTurn, globalChain, setGlobalChain } = useDB();
   const address = useAddress();
@@ -54,23 +55,54 @@ const GameId = ({ params }: { params: any }) => {
 
   useEffect(() => {
     if (address) {
+
+      console.log("------------------")
       const stmt = db
         .prepare("SELECT * FROM tictactoegames_11155111_152 WHERE id = ?")
         .bind(params.gameid);
       const getData = async () => {
-        const result = await stmt.all();
-        if (result.results[0]) {
-          console.log(result.results[0], "res in game id");
-          setDetails(result.results[0]);
-          if (result.results[0] && result.results[0].player2 !== null) {
-            setIsJoined(true);
+
+        if (isJoined)
+          return;
+
+        console.log("---------------------------------")
+        try {
+
+          const result = await stmt.all();
+
+          console.log(result, "result")
+          if (result.results[0]) {
+            console.log(result.results[0], "res in game id");
+            setDetails(result.results[0]);
+            if (result.results[0] && result.results[0].player2 !== null) {
+              setIsJoined(true);
+            }
+          }
+
+          if (result.results.length === 0) {
+            console.log(result.results.length, "length");
+            console.log(result)
+            window.location.reload();
+            // router.push("/dashboard");
           }
         }
-        // if (result.results.length === 0) {
-        //   router.push("/dashboard");
-        // }
+        catch (err) {
+          console.log(err)
+
+        }
       };
-      getData();
+
+      // const myInterval = setInterval(() => {
+      //   if (isJoined === false) {
+      //     getData();
+      //   }
+      // }, 5000);
+
+      // if (isJoined === true)
+      //   clearInterval(myInterval);
+
+
+
       console.log(address, "address");
     }
 
@@ -197,15 +229,15 @@ const GameId = ({ params }: { params: any }) => {
 
   useEffect(() => {
     console.log("CHAIN--------", chain?.chain);
-    if (chain?.chain === "Polygon") {
+    if (chain && chain?.chain === "Polygon") {
       setGlobalTurn("o")
       setGlobalChain("polygon")
       setSourceChain(5);
       setTargetChain(6);
     }
-    else if (chain?.chain === "AVAX") {
+    else if (chain && chain?.chain === "AVAX") {
       setGlobalTurn("x")
-      setGlobalChain("goerli")
+      setGlobalChain("avalanche-fuji")
     }
 
 
@@ -224,16 +256,16 @@ const GameId = ({ params }: { params: any }) => {
     setTargetHelloWormholeContract(targetContract);
   }, [signer]);
 
-  useEffect(() => {
-    console.log(
-      sourceHelloWormholeContract?.latestGreeting,
-      "sourceHelloWormholeContract"
-    );
-    console.log(
-      targetHelloWormholeContract?.latestGreeting,
-      "targetHelloWormholeContract"
-    );
-  }, [sourceHelloWormholeContract, targetHelloWormholeContract]);
+  // useEffect(() => {
+  //   console.log(
+  //     sourceHelloWormholeContract?.latestGreeting,
+  //     "sourceHelloWormholeContract"
+  //   );
+  //   console.log(
+  //     targetHelloWormholeContract?.latestGreeting,
+  //     "targetHelloWormholeContract"
+  //   );
+  // }, [sourceHelloWormholeContract, targetHelloWormholeContract]);
 
   // smart contract events
   useEffect(() => {
@@ -355,30 +387,30 @@ const GameId = ({ params }: { params: any }) => {
   console.log(turn, "turn now");
 
 
-  useEffect(() => {
-    console.log(details);
+  // useEffect(() => {
+  //   console.log(details);
 
-    if (details && details.player1 !== undefined) {
-      console.log(
-        details.player1.toLowerCase() === address?.toLowerCase(),
-        "condition"
-      );
-    } else {
-      console.log("undefined player 1");
-    }
-    console.log(turn, "o".toLowerCase());
-    console.log(turn === "o".toLowerCase());
-    console.log(
-      "is joined",
-      isJoined,
-      turn
-      // details.player1.toLowerCase() === address?.toLowerCase()
-    );
-    console.log("details ", details);
-    console.log("chains", globalChain);
-    console.log("turns ", turn, globalTurn);
+  //   if (details && details.player1 !== undefined) {
+  //     console.log(
+  //       details.player1.toLowerCase() === address?.toLowerCase(),
+  //       "condition"
+  //     );
+  //   } else {
+  //     console.log("undefined player 1");
+  //   }
+  //   console.log(turn, "o".toLowerCase());
+  //   console.log(turn === "o".toLowerCase());
+  //   console.log(
+  //     "is joined",
+  //     isJoined,
+  //     turn
+  //     // details.player1.toLowerCase() === address?.toLowerCase()
+  //   );
+  //   console.log("details ", details);
+  //   console.log("chains", globalChain);
+  //   console.log("turns ", turn, globalTurn);
 
-  }, [turn, globalTurn, details]);
+  // }, [turn, globalTurn, details]);
 
   // prevents hydration error
   useEffect(() => {
@@ -387,124 +419,124 @@ const GameId = ({ params }: { params: any }) => {
   if (!mounted) return null;
 
 
-  if (!isJoined) {
-    return (
-      <div className="grid place-items-center min-h-screen w-screen">
-        <div>Waiting for player 2 to join</div>
-      </div>
-    );
-  } else {
-    return (
-      <div className="min-h-screen w-screen flex justify-center items-center flex-col">
-        <p>{chain && chain.chain}</p>
-        <div className="absolute top-5 right-10">
-          <div className="flex space-x-5">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="outline">
-                  {address &&
-                    address.slice(0, 5) + "...." + address.slice(-4)}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={Disconnect}>
-                  <p className="text-red-400">Disconnect</p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <ModeToggle />
-          </div>
+  // if (!isJoined) {
+  //   return (
+  //     <div className="grid place-items-center min-h-screen w-screen">
+  //       <div>Waiting for player 2 to join</div>
+  //     </div>
+  //   );
+  // } else {
+  return (
+    <div className="min-h-screen w-screen flex justify-center items-center flex-col">
+      <p>{chain && chain.chain}</p>
+      <div className="absolute top-5 right-10">
+        <div className="flex space-x-5">
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="outline">
+                {address &&
+                  address.slice(0, 5) + "...." + address.slice(-4)}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={Disconnect}>
+                <p className="text-red-400">Disconnect</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ModeToggle />
         </div>
+      </div>
 
-        {globalTurn !== turn && <div className="overlay"></div>}
-        <div className="tic-tac-toe">
-          <h1> TIC-TAC-TOE </h1>
-          <button onClick={() => resetGame()}>New Game</button>
-          <div className="game" >
-            {Array.from("012345678").map((ind: any) => (
-              <Square
-                key={ind}
-                ind={ind}
-                updateSquares={updateSquares}
-                clsName={squares[ind]}
-              />
-            ))}
-          </div>
-          <div className={`turn ${turn === "x" ? "left" : "right"}`}>
-            <Square clsName="x" />
-            <Square clsName="o" />
-          </div>
-          <AnimatePresence>
-            {winner && (
+      {globalTurn !== turn && <div className="overlay"></div>}
+      <div className="tic-tac-toe">
+        <h1> TIC-TAC-TOE </h1>
+        <button onClick={() => resetGame()}>New Game</button>
+        <div className="game" >
+          {Array.from("012345678").map((ind: any) => (
+            <Square
+              key={ind}
+              ind={ind}
+              updateSquares={updateSquares}
+              clsName={squares[ind]}
+            />
+          ))}
+        </div>
+        <div className={`turn ${turn === "x" ? "left" : "right"}`}>
+          <Square clsName="x" />
+          <Square clsName="o" />
+        </div>
+        <AnimatePresence>
+          {winner && (
+            <motion.div
+              key={"parent-box"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="winner"
+            >
               <motion.div
-                key={"parent-box"}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="winner"
+                key={"child-box"}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="text"
               >
-                <motion.div
-                  key={"child-box"}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  className="text"
+                <motion.h2
+                  initial={{ scale: 0, y: 100 }}
+                  animate={{
+                    scale: 1,
+                    y: 0,
+                    transition: {
+                      y: { delay: 0.7 },
+                      duration: 0.7,
+                    },
+                  }}
                 >
-                  <motion.h2
-                    initial={{ scale: 0, y: 100 }}
-                    animate={{
-                      scale: 1,
-                      y: 0,
-                      transition: {
-                        y: { delay: 0.7 },
-                        duration: 0.7,
-                      },
-                    }}
-                  >
-                    {winner === "x | o" ? "No Winner :/" : "Win !! :)"}
-                  </motion.h2>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{
-                      scale: 1,
-                      transition: {
-                        delay: 1.3,
-                        duration: 0.2,
-                      },
-                    }}
-                    className="win"
-                  >
-                    {winner === "x | o" ? (
-                      <>
-                        <Square clsName="x" />
-                        <Square clsName="o" />
-                      </>
-                    ) : (
-                      <>
-                        <Square clsName={winner} />
-                      </>
-                    )}
-                  </motion.div>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{
-                      scale: 1,
-                      transition: { delay: 1.5, duration: 0.3 },
-                    }}
-                  >
-                    <button onClick={() => resetGame()}>New Game</button>
-                  </motion.div>
+                  {winner === "x | o" ? "No Winner :/" : "Win !! :)"}
+                </motion.h2>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{
+                    scale: 1,
+                    transition: {
+                      delay: 1.3,
+                      duration: 0.2,
+                    },
+                  }}
+                  className="win"
+                >
+                  {winner === "x | o" ? (
+                    <>
+                      <Square clsName="x" />
+                      <Square clsName="o" />
+                    </>
+                  ) : (
+                    <>
+                      <Square clsName={winner} />
+                    </>
+                  )}
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{
+                    scale: 1,
+                    transition: { delay: 1.5, duration: 0.3 },
+                  }}
+                >
+                  <button onClick={() => resetGame()}>New Game</button>
                 </motion.div>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-};
+// };
 
 export default GameId;

@@ -16,7 +16,7 @@ const DBContextProvider = ({ children }: { children: ReactNode }) => {
   const signer = new NonceManager(baseSigner);
   const db = new Database({ signer });
 
-  const [globalChain, setGlobalChain] = useState("celo-alfajores-testnet");
+  const [globalChain, setGlobalChain] = useState("avalanche-fuji");
   const [globalTurn, setGlobalTurn] = useState("o");
   // Connect to the database
   return (
