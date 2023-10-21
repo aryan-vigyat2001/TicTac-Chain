@@ -1,12 +1,12 @@
 {
   "chains": [
     {
-      "description": "Avalanche testnet fuji",
+      "description": "Etherium Goerli",
       "chainId": 6,
-      "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
-      "tokenBridge": "0x61E44E506Ca5659E6c0bba9b678586fA2d729756",
-      "wormholeRelayer": "0xA3cF45939bD6260bcFe3D66bc73d60f19e49a8BB",
-      "wormhole": "0x7bbcE28e64B3F8b84d876Ab298393c38ad7aac4C"
+      "rpc": "https://eth-goerli.g.alchemy.com/v2/YqP3r2m2EfMA-sRekm7IeZMuGVCZ0oZ4",
+      "tokenBridge": "0xF890982f9310df57d00f659cf4fd87e65adEd8d7",
+      "wormholeRelayer": "0x28D8F1Be96f97C1387e94A53e00eCcFb4E75175a",
+      "wormhole": "0x706abc4E45D419950511e474C7B9Ed348A4a716c"
     },
     {
       "description": "Polygon Testnet",

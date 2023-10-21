@@ -1,21 +1,21 @@
 "use client";
 import useDB from "@/hooks/useDB";
-import {useAddress} from "@thirdweb-dev/react";
-import {Router} from "lucide-react";
+import { useAddress } from "@thirdweb-dev/react";
+import { Router } from "lucide-react";
 import React from "react";
-import {useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
 import {
   useSigner,
   useChain,
   useDisconnect,
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
-import {CHAIN_ID_TO_NAME, cosmos} from "@certusone/wormhole-sdk";
+import { CHAIN_ID_TO_NAME, cosmos } from "@certusone/wormhole-sdk";
 // import { describe, expect, test } from "@jest/globals";
-import {Wallet, ethers} from "ethers";
+import { Wallet, ethers } from "ethers";
 import {
   getHelloWormhole,
   getDeliveryHash,
@@ -30,11 +30,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Square from "../../../components/Square";
-import {AnimatePresence, motion} from "framer-motion";
-import {toast} from "@/components/ui/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "@/components/ui/use-toast";
 
-const GameId = ({params}: {params: any}) => {
-  const {db} = useDB();
+const GameId = ({ params }: { params: any }) => {
+  const { db, globalTurn, setGlobalTurn, globalChain, setGlobalChain } = useDB();
   const address = useAddress();
   const chain = useChain();
   const isMismatch = useNetworkMismatch();
@@ -73,6 +73,8 @@ const GameId = ({params}: {params: any}) => {
       getData();
       console.log(address, "address");
     }
+
+    console.log(address, "address outside if");
   }, [db, params.gameid, address, isJoined]);
 
   const Disconnect = async () => {
@@ -180,11 +182,11 @@ const GameId = ({params}: {params: any}) => {
   };
 
   const convertJsonToString = (inputJson: any) => {
-    const {payload, game, turn} = inputJson;
+    const { payload, game, turn } = inputJson;
     const payloadString = payload
       .map((char: any) => (char === "x" || char === "o" ? char : "-"))
       .join("");
-    const resultString = `${payloadString}_${game}_${turn}`;
+    const resultString = `${payloadString}_${game}`;
     console.log("result String ", resultString);
     return resultString;
   };
@@ -194,16 +196,23 @@ const GameId = ({params}: {params: any}) => {
   // const [signer, setSigner] = useState<Wallet>();
 
   useEffect(() => {
-    console.log(chain?.chain);
+    console.log("CHAIN--------", chain?.chain);
     if (chain?.chain === "Polygon") {
+      setGlobalTurn("o")
+      setGlobalChain("polygon")
       setSourceChain(5);
       setTargetChain(6);
     }
+    else if (chain?.chain === "AVAX") {
+      setGlobalTurn("x")
+      setGlobalChain("goerli")
+    }
+
 
     if (address) {
       console.log(address, "address");
     }
-  }, []);
+  }, [chain]);
 
   useEffect(() => {
     if (!signer) {
@@ -321,7 +330,7 @@ const GameId = ({params}: {params: any}) => {
         targetChain,
         targetHelloWormholeContract.address,
         message,
-        {value: cost}
+        { value: cost }
       );
       console.log(`Transaction hash: ${tx.hash}`);
       const rx = await tx.wait();
@@ -330,7 +339,7 @@ const GameId = ({params}: {params: any}) => {
       const deliveryHash = await getDeliveryHash(
         rx,
         CHAIN_ID_TO_NAME[sourceChain as keyof typeof CHAIN_ID_TO_NAME],
-        {network: "TESTNET"}
+        { network: "TESTNET" }
       );
 
       console.log("Waiting for delivery...");
@@ -345,6 +354,7 @@ const GameId = ({params}: {params: any}) => {
 
   console.log(turn, "turn now");
 
+
   useEffect(() => {
     console.log(details);
 
@@ -358,7 +368,17 @@ const GameId = ({params}: {params: any}) => {
     }
     console.log(turn, "o".toLowerCase());
     console.log(turn === "o".toLowerCase());
-  }, [details]);
+    console.log(
+      "is joined",
+      isJoined,
+      turn
+      // details.player1.toLowerCase() === address?.toLowerCase()
+    );
+    console.log("details ", details);
+    console.log("chains", globalChain);
+    console.log("turns ", turn, globalTurn);
+
+  }, [turn, globalTurn, details]);
 
   // prevents hydration error
   useEffect(() => {
@@ -366,13 +386,6 @@ const GameId = ({params}: {params: any}) => {
   }, []);
   if (!mounted) return null;
 
-  console.log(
-    "is joined",
-    isJoined,
-    turn
-    // details.player1.toLowerCase() === address?.toLowerCase()
-  );
-  console.log("details ", details);
 
   if (!isJoined) {
     return (
@@ -380,150 +393,118 @@ const GameId = ({params}: {params: any}) => {
         <div>Waiting for player 2 to join</div>
       </div>
     );
-  } else if (isJoined) {
-    if (
-      turn === "o".toLowerCase() &&
-      details.player1.toLowerCase() === address?.toLowerCase()
-    ) {
-      return (
-        <div className="min-h-screen w-screen bg-white text-black">hello</div>
-      );
-    } else if (
-      turn === "x".toLowerCase() &&
-      details.player2.toLowerCase() === address?.toLowerCase()
-    ) {
-      return (
-        <div className="min-h-screen w-screen flex justify-center items-center flex-col">
-          <p>{chain && chain.chain}</p>
-          <div className="absolute top-5 right-10">
-            <div className="flex space-x-5">
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant="outline">
-                    {address &&
-                      address.slice(0, 5) + "...." + address.slice(-4)}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={Disconnect}>
-                    <p className="text-red-400">Disconnect</p>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ModeToggle />
-            </div>
-          </div>
-
-          <div className="tic-tac-toe">
-            <h1> TIC-TAC-TOE </h1>
-
-            {/* <button onClick={() => runHelloWormholeIntegrationTest("hello")}>
-              Send Message
-            </button>
-            <button onClick={() => convertStringToJson("-X-------_1234")}>
-              Get greeting
-            </button> */}
-            {/* <button
-              onClick={() =>
-                convertJsonToString({
-                  payload: ["X", "", "", "", "", "", "", "", ""],
-                  game: "1234",
-                })
-              }
-            >
-              Get greeting
-            </button> */}
-            <button onClick={() => resetGame()}>New Game</button>
-            <div className="game">
-              {Array.from("012345678").map((ind: any) => (
-                <Square
-                  key={ind}
-                  ind={ind}
-                  updateSquares={updateSquares}
-                  clsName={squares[ind]}
-                />
-              ))}
-            </div>
-            <div className={`turn ${turn === "x" ? "left" : "right"}`}>
-              <Square clsName="x" />
-              <Square clsName="o" />
-            </div>
-            <AnimatePresence>
-              {winner && (
-                <motion.div
-                  key={"parent-box"}
-                  initial={{opacity: 0}}
-                  animate={{opacity: 1}}
-                  exit={{opacity: 0}}
-                  className="winner"
-                >
-                  <motion.div
-                    key={"child-box"}
-                    initial={{scale: 0}}
-                    animate={{scale: 1}}
-                    exit={{scale: 0, opacity: 0}}
-                    className="text"
-                  >
-                    <motion.h2
-                      initial={{scale: 0, y: 100}}
-                      animate={{
-                        scale: 1,
-                        y: 0,
-                        transition: {
-                          y: {delay: 0.7},
-                          duration: 0.7,
-                        },
-                      }}
-                    >
-                      {winner === "x | o" ? "No Winner :/" : "Win !! :)"}
-                    </motion.h2>
-                    <motion.div
-                      initial={{scale: 0}}
-                      animate={{
-                        scale: 1,
-                        transition: {
-                          delay: 1.3,
-                          duration: 0.2,
-                        },
-                      }}
-                      className="win"
-                    >
-                      {winner === "x | o" ? (
-                        <>
-                          <Square clsName="x" />
-                          <Square clsName="o" />
-                        </>
-                      ) : (
-                        <>
-                          <Square clsName={winner} />
-                        </>
-                      )}
-                    </motion.div>
-                    <motion.div
-                      initial={{scale: 0}}
-                      animate={{
-                        scale: 1,
-                        transition: {delay: 1.5, duration: 0.3},
-                      }}
-                    >
-                      <button onClick={() => resetGame()}>New Game</button>
-                    </motion.div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+  } else {
+    return (
+      <div className="min-h-screen w-screen flex justify-center items-center flex-col">
+        <p>{chain && chain.chain}</p>
+        <div className="absolute top-5 right-10">
+          <div className="flex space-x-5">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant="outline">
+                  {address &&
+                    address.slice(0, 5) + "...." + address.slice(-4)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={Disconnect}>
+                  <p className="text-red-400">Disconnect</p>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ModeToggle />
           </div>
         </div>
-      );
-    }
-  } else
-    return (
-      <div className="min-h-screen w-screen bg-white text-black">
-        hello world
+
+        {globalTurn !== turn && <div className="overlay"></div>}
+        <div className="tic-tac-toe">
+          <h1> TIC-TAC-TOE </h1>
+          <button onClick={() => resetGame()}>New Game</button>
+          <div className="game" >
+            {Array.from("012345678").map((ind: any) => (
+              <Square
+                key={ind}
+                ind={ind}
+                updateSquares={updateSquares}
+                clsName={squares[ind]}
+              />
+            ))}
+          </div>
+          <div className={`turn ${turn === "x" ? "left" : "right"}`}>
+            <Square clsName="x" />
+            <Square clsName="o" />
+          </div>
+          <AnimatePresence>
+            {winner && (
+              <motion.div
+                key={"parent-box"}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="winner"
+              >
+                <motion.div
+                  key={"child-box"}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  className="text"
+                >
+                  <motion.h2
+                    initial={{ scale: 0, y: 100 }}
+                    animate={{
+                      scale: 1,
+                      y: 0,
+                      transition: {
+                        y: { delay: 0.7 },
+                        duration: 0.7,
+                      },
+                    }}
+                  >
+                    {winner === "x | o" ? "No Winner :/" : "Win !! :)"}
+                  </motion.h2>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{
+                      scale: 1,
+                      transition: {
+                        delay: 1.3,
+                        duration: 0.2,
+                      },
+                    }}
+                    className="win"
+                  >
+                    {winner === "x | o" ? (
+                      <>
+                        <Square clsName="x" />
+                        <Square clsName="o" />
+                      </>
+                    ) : (
+                      <>
+                        <Square clsName={winner} />
+                      </>
+                    )}
+                  </motion.div>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{
+                      scale: 1,
+                      transition: { delay: 1.5, duration: 0.3 },
+                    }}
+                  >
+                    <button onClick={() => resetGame()}>New Game</button>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     );
+  }
+
 };
 
 export default GameId;

@@ -22,7 +22,7 @@ async function main() {
     await read()
     return
   }
-  if(checkFlag("--getStatus")) {
+  if (checkFlag("--getStatus")) {
     const status = await getStatus("avalanche", getArg(["--txHash", "--tx", "-t"]) || "");
     console.log(status.info);
   }
@@ -41,7 +41,7 @@ async function sendGreeting() {
   console.log(`cost: ${ethers.utils.formatEther(cost)}`)
 
   const tx = await helloWormhole
-    .sendCrossChainGreeting(to, getHelloWormhole(to).address, greeting, {value: cost});
+    .sendCrossChainGreeting(to, getHelloWormhole(to).address, greeting, { value: cost });
   await tx.wait();
   console.log(`Greeting "${greeting}" sent from chain ${from} to chain ${to}\nTransaction hash ${tx.hash}\nView Transaction at https://testnet.snowtrace.io/tx/${tx.hash}`)
 }

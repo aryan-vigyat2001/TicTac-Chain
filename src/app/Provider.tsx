@@ -12,14 +12,14 @@ import {
   walletConnect,
 } from "@thirdweb-dev/react";
 // import * as React from "react";
-import {ThemeProvider as NextThemesProvider} from "next-themes";
-import {ReactNode, useContext, useEffect, useState} from "react";
-import {type ThemeProviderProps} from "next-themes/dist/types";
-import {AvalancheFuji, Mumbai} from "@thirdweb-dev/chains";
-import DBContextProvider, {DBContext} from "@/context/DBContext";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ReactNode, useContext, useEffect, useState } from "react";
+import { type ThemeProviderProps } from "next-themes/dist/types";
+import { AvalancheFuji, Mumbai, CeloAlfajoresTestnet } from "@thirdweb-dev/chains";
+import DBContextProvider, { DBContext } from "@/context/DBContext";
 
-export function ThemeProvider({children, ...props}: ThemeProviderProps) {
-  const {globalChain, setGlobalChain} = useContext(DBContext);
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  const { globalChain, setGlobalChain } = useContext(DBContext);
   const [arr, setArr] = useState([AvalancheFuji, Mumbai]);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function ThemeProvider({children, ...props}: ThemeProviderProps) {
       activeChain={globalChain || "avalanche-fuji"}
       supportedChains={arr}
       supportedWallets={[
-        metamaskWallet({recommended: true}),
+        metamaskWallet({ recommended: true }),
         coinbaseWallet(),
         walletConnect(),
         safeWallet({

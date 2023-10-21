@@ -64,7 +64,7 @@ const config = {
     {
       "description": "Avalanche testnet fuji",
       "chainId": 6,
-      "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
+      "rpc": "https://avalanche-fuji.infura.io/v3/25ec797417734215b047169c1d100590",
       "tokenBridge": "0x61E44E506Ca5659E6c0bba9b678586fA2d729756",
       "wormholeRelayer": "0xA3cF45939bD6260bcFe3D66bc73d60f19e49a8BB",
       "wormhole": "0x7bbcE28e64B3F8b84d876Ab298393c38ad7aac4C"
@@ -106,11 +106,19 @@ export function loadDeployedAddresses(
         "helloWormhole": [
           "null",
           "null",
+          "0xc136166058f2166Be5D0f128bd61d598cF7582C6",
+          "null",
+          "null",
+          "0x04f84917Aa6244E307dcdc78dA979120b5A11178",
+          "0x1aB236eF4C0906cb78929b65d9Ad1254F7aA19C7",
           "null",
           "null",
           "null",
-          "0xfe53483A62f197Ff5dCb0Fc86Da235fB78B13613",
-          "0x39C6bE1F00F034Dc6d78980bc94087A58b31e690",
+          "null",
+          "null",
+          "null",
+          "null",
+          "0xbD0730b4a87bd3D725A02246ccDdB16785f584cD",
           "null",
           "null",
           "null",
@@ -118,7 +126,9 @@ export function loadDeployedAddresses(
           "null",
           "null",
           "null",
-          "0x07bd3D009ef953dE31e57C2E64CC512DDD71EcbE"
+          "null",
+          "null",
+          "0xc136166058f2166Be5D0f128bd61d598cF7582C6"
         ]
       }
 

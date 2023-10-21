@@ -1,12 +1,12 @@
 "use client";
 
-import {ModeToggle} from "@/components/Toggletheme";
-import {Button} from "@/components/ui/button";
+import { ModeToggle } from "@/components/Toggletheme";
+import { Button } from "@/components/ui/button";
 
-import {useSigner} from "@thirdweb-dev/react";
-import {CHAIN_ID_TO_NAME, cosmos} from "@certusone/wormhole-sdk";
+import { useSigner } from "@thirdweb-dev/react";
+import { CHAIN_ID_TO_NAME, cosmos } from "@certusone/wormhole-sdk";
 // import { describe, expect, test } from "@jest/globals";
-import {Wallet, ethers} from "ethers";
+import { Wallet, ethers } from "ethers";
 import {
   getHelloWormhole,
   getDeliveryHash,
@@ -19,8 +19,8 @@ import {
   useDisconnect,
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
-import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,10 +29,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {toast} from "@/components/ui/use-toast";
-import {generate} from "random-words";
+import { toast } from "@/components/ui/use-toast";
+import { generate } from "random-words";
 import Square from "../../components/Square";
-import {AnimatePresence, motion} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Dashboard() {
   const chain = useChain();
@@ -165,7 +165,7 @@ export default function Dashboard() {
   };
 
   const convertJsonToString = (inputJson: any) => {
-    const {payload, game, turn} = inputJson;
+    const { payload, game, turn } = inputJson;
     const payloadString = payload
       .map((char: any) => (char === "x" || char === "o" ? char : "-"))
       .join("");
@@ -180,7 +180,7 @@ export default function Dashboard() {
     console.log(chain?.chain);
     if (chain?.chain === "Polygon") {
       setSourceChain(5);
-      setTargetChain(6);
+      setTargetChain(2);
     }
   }, []);
 
@@ -297,7 +297,7 @@ export default function Dashboard() {
         targetChain,
         targetHelloWormholeContract.address,
         message,
-        {value: cost}
+        { value: cost }
       );
       console.log(`Transaction hash: ${tx.hash}`);
       const rx = await tx.wait();
@@ -306,7 +306,7 @@ export default function Dashboard() {
       const deliveryHash = await getDeliveryHash(
         rx,
         CHAIN_ID_TO_NAME[sourceChain as keyof typeof CHAIN_ID_TO_NAME],
-        {network: "TESTNET"}
+        { network: "TESTNET" }
       );
 
       console.log("Waiting for delivery...");
@@ -385,25 +385,25 @@ export default function Dashboard() {
           {winner && (
             <motion.div
               key={"parent-box"}
-              initial={{opacity: 0}}
-              animate={{opacity: 1}}
-              exit={{opacity: 0}}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="winner"
             >
               <motion.div
                 key={"child-box"}
-                initial={{scale: 0}}
-                animate={{scale: 1}}
-                exit={{scale: 0, opacity: 0}}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
                 className="text"
               >
                 <motion.h2
-                  initial={{scale: 0, y: 100}}
+                  initial={{ scale: 0, y: 100 }}
                   animate={{
                     scale: 1,
                     y: 0,
                     transition: {
-                      y: {delay: 0.7},
+                      y: { delay: 0.7 },
                       duration: 0.7,
                     },
                   }}
@@ -411,7 +411,7 @@ export default function Dashboard() {
                   {winner === "x | o" ? "No Winner :/" : "Win !! :)"}
                 </motion.h2>
                 <motion.div
-                  initial={{scale: 0}}
+                  initial={{ scale: 0 }}
                   animate={{
                     scale: 1,
                     transition: {
@@ -433,10 +433,10 @@ export default function Dashboard() {
                   )}
                 </motion.div>
                 <motion.div
-                  initial={{scale: 0}}
+                  initial={{ scale: 0 }}
                   animate={{
                     scale: 1,
-                    transition: {delay: 1.5, duration: 0.3},
+                    transition: { delay: 1.5, duration: 0.3 },
                   }}
                 >
                   <button onClick={() => resetGame()}>New Game</button>

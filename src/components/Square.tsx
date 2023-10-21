@@ -1,4 +1,4 @@
-import {motion} from "framer-motion";
+import { motion } from "framer-motion";
 
 const Square = ({
   ind,
@@ -14,15 +14,15 @@ const Square = ({
   };
   return (
     <motion.div
-      initial={{scale: 0}}
-      animate={{scale: 1}}
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
       className="square"
       onClick={handleClick}
     >
       {clsName && (
         <motion.span
-          initial={{scale: 0}}
-          animate={{scale: 1}}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
           className={clsName}
         ></motion.span>
       )}

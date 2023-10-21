@@ -1,13 +1,13 @@
 "use client";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import useDB from "@/hooks/useDB";
-import {useAddress} from "@thirdweb-dev/react";
-import {useRouter} from "next/navigation";
-import {useState} from "react";
+import { useAddress } from "@thirdweb-dev/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Dashboard() {
-  const {db} = useDB();
+  const { db } = useDB();
   const router = useRouter();
   const [gameNo, setGameNo] = useState(0);
   const address = useAddress();
@@ -69,7 +69,7 @@ export default function Dashboard() {
       } else {
         // console.log("gameId", gameId);
         // console.log("address here", address);
-        const {meta: update} = await db
+        const { meta: update } = await db
           .prepare(
             `UPDATE tictactoegames_11155111_152 SET player2 = ? WHERE id = ?`
           )

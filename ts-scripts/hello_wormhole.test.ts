@@ -4,7 +4,7 @@ import { getHelloWormhole, getWallet, getDeliveryHash, sleep } from "./utils";
 import { CHAIN_ID_TO_NAME } from "@certusone/wormhole-sdk";
 
 const sourceChain = 5;
-const targetChain = 6 ;
+const targetChain = 6;
 
 describe("Hello Wormhole Integration Tests on Testnet", () => {
   test(
