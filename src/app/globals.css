@@ -98,6 +98,16 @@
   border-radius: 999px;
 }
 
+.avail-game::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+.avail-game::-webkit-scrollbar-thumb {
+  overflow: hidden;
+  background-color: gray;
+  border-radius: 999px;
+}
+
 .square {
   width: 100px;
   height: 100px;
@@ -142,6 +152,7 @@
 .tic-tac-toe {
   width: fit-content;
   margin: 40px auto;
+  margin-top: 0;
   text-align: center;
 }
 

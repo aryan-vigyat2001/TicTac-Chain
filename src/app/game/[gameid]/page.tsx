@@ -1,21 +1,21 @@
 "use client";
 import useDB from "@/hooks/useDB";
-import { Router } from "lucide-react";
-import { useAddress } from "@thirdweb-dev/react";
+import {Router} from "lucide-react";
+import {useAddress} from "@thirdweb-dev/react";
 import React from "react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ModeToggle } from "@/components/Toggletheme";
-import { Button } from "@/components/ui/button";
+import {useEffect, useState} from "react";
+import {useRouter} from "next/navigation";
+import {ModeToggle} from "@/components/Toggletheme";
+import {Button} from "@/components/ui/button";
 import {
   useSigner,
   useChain,
   useDisconnect,
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
-import { CHAIN_ID_TO_NAME, cosmos } from "@certusone/wormhole-sdk";
+import {CHAIN_ID_TO_NAME, cosmos} from "@certusone/wormhole-sdk";
 // import { describe, expect, test } from "@jest/globals";
-import { Wallet, ethers } from "ethers";
+import {Wallet, ethers} from "ethers";
 import {
   getHelloWormhole,
   getDeliveryHash,
@@ -30,12 +30,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Square from "../../../components/Square";
-import { AnimatePresence, motion } from "framer-motion";
-import { toast } from "@/components/ui/use-toast";
+import {AnimatePresence, motion} from "framer-motion";
+import {toast} from "@/components/ui/use-toast";
+import {Badge} from "@/components/ui/badge";
 
-
-const GameId = ({ params }: { params: any }) => {
-  const { db, globalTurn, setGlobalTurn, globalChain, setGlobalChain } = useDB();
+const GameId = ({params}: {params: any}) => {
+  const {db, globalTurn, setGlobalTurn, globalChain, setGlobalChain} = useDB();
   const address = useAddress();
   const chain = useChain();
   const isMismatch = useNetworkMismatch();
@@ -54,23 +54,25 @@ const GameId = ({ params }: { params: any }) => {
   const [details, setDetails] = useState<any>();
 
   useEffect(() => {
-    if (address) {
+    if (!address) {
+      router.push("/connectwallet");
+    }
+  }, [address]);
 
-      console.log("------------------")
+  useEffect(() => {
+    if (address) {
+      console.log("------------------");
       const stmt = db
         .prepare("SELECT * FROM tictactoegames_11155111_152 WHERE id = ?")
         .bind(params.gameid);
       const getData = async () => {
+        if (isJoined) return;
 
-        if (isJoined)
-          return;
-
-        console.log("---------------------------------")
+        console.log("---------------------------------");
         try {
-
           const result = await stmt.all();
 
-          console.log(result, "result")
+          console.log(result, "result");
           if (result.results[0]) {
             console.log(result.results[0], "res in game id");
             setDetails(result.results[0]);
@@ -81,14 +83,12 @@ const GameId = ({ params }: { params: any }) => {
 
           if (result.results.length === 0) {
             console.log(result.results.length, "length");
-            console.log(result)
+            console.log(result);
             window.location.reload();
             // router.push("/dashboard");
           }
-        }
-        catch (err) {
-          console.log(err)
-
+        } catch (err) {
+          console.log(err);
         }
       };
 
@@ -100,8 +100,6 @@ const GameId = ({ params }: { params: any }) => {
 
       // if (isJoined === true)
       //   clearInterval(myInterval);
-
-
 
       console.log(address, "address");
     }
@@ -214,7 +212,7 @@ const GameId = ({ params }: { params: any }) => {
   };
 
   const convertJsonToString = (inputJson: any) => {
-    const { payload, game, turn } = inputJson;
+    const {payload, game, turn} = inputJson;
     const payloadString = payload
       .map((char: any) => (char === "x" || char === "o" ? char : "-"))
       .join("");
@@ -230,16 +228,14 @@ const GameId = ({ params }: { params: any }) => {
   useEffect(() => {
     console.log("CHAIN--------", chain?.chain);
     if (chain && chain?.chain === "Polygon") {
-      setGlobalTurn("o")
-      setGlobalChain("polygon")
+      setGlobalTurn("o");
+      setGlobalChain("polygon");
       setSourceChain(5);
       setTargetChain(6);
+    } else if (chain && chain?.chain === "AVAX") {
+      setGlobalTurn("x");
+      setGlobalChain("avalanche-fuji");
     }
-    else if (chain && chain?.chain === "AVAX") {
-      setGlobalTurn("x")
-      setGlobalChain("avalanche-fuji")
-    }
-
 
     if (address) {
       console.log(address, "address");
@@ -288,7 +284,7 @@ const GameId = ({ params }: { params: any }) => {
           setSquares(msg.payload);
           console.log(turn, "at source");
           // globalTurn === "x" ? setTurn("o") : setTurn("x");
-          setTurn(globalTurn)
+          setTurn(globalTurn);
         }
       );
     } else {
@@ -318,7 +314,7 @@ const GameId = ({ params }: { params: any }) => {
           setSquares(msg.payload);
           console.log(turn, "at dest");
           // globalTurn === "x" ? setTurn("o") : setTurn("x");
-          setTurn(globalTurn)
+          setTurn(globalTurn);
         }
       );
     } else {
@@ -364,7 +360,7 @@ const GameId = ({ params }: { params: any }) => {
         targetChain,
         targetHelloWormholeContract.address,
         message,
-        { value: cost }
+        {value: cost}
       );
       console.log(`Transaction hash: ${tx.hash}`);
       const rx = await tx.wait();
@@ -373,7 +369,7 @@ const GameId = ({ params }: { params: any }) => {
       const deliveryHash = await getDeliveryHash(
         rx,
         CHAIN_ID_TO_NAME[sourceChain as keyof typeof CHAIN_ID_TO_NAME],
-        { network: "TESTNET" }
+        {network: "TESTNET"}
       );
 
       console.log("Waiting for delivery...");
@@ -387,7 +383,6 @@ const GameId = ({ params }: { params: any }) => {
   };
 
   console.log(turn, "turn now");
-
 
   // useEffect(() => {
   //   console.log(details);
@@ -420,7 +415,6 @@ const GameId = ({ params }: { params: any }) => {
   }, []);
   if (!mounted) return null;
 
-
   // if (!isJoined) {
   //   return (
   //     <div className="grid place-items-center min-h-screen w-screen">
@@ -430,14 +424,19 @@ const GameId = ({ params }: { params: any }) => {
   // } else {
   return (
     <div className="min-h-screen w-screen flex justify-center items-center flex-col">
-      <p>{chain && chain.chain}</p>
+      <div className="pt-6 flex flex-col justify-center items-center space-y-5">
+        <p className="text-sm text-bold">
+          Turn: {globalTurn && globalTurn.toUpperCase()}
+        </p>
+        <Badge className="text-md">{chain && chain.chain} Chain</Badge>
+      </div>
+
       <div className="absolute top-5 right-10">
         <div className="flex space-x-5">
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Button variant="outline">
-                {address &&
-                  address.slice(0, 5) + "...." + address.slice(-4)}
+                {address && address.slice(0, 5) + "...." + address.slice(-4)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -454,9 +453,10 @@ const GameId = ({ params }: { params: any }) => {
 
       {globalTurn !== turn && <div className="overlay"></div>}
       <div className="tic-tac-toe">
-        <h1> TIC-TAC-TOE </h1>
-        <button onClick={() => resetGame()}>New Game</button>
-        <div className="game" >
+        <Button className="text-lg w-fit h-fit" onClick={() => resetGame()}>
+          New Game
+        </Button>
+        <div className="game">
           {Array.from("012345678").map((ind: any) => (
             <Square
               key={ind}
@@ -474,25 +474,25 @@ const GameId = ({ params }: { params: any }) => {
           {winner && (
             <motion.div
               key={"parent-box"}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{opacity: 0}}
+              animate={{opacity: 1}}
+              exit={{opacity: 0}}
               className="winner"
             >
               <motion.div
                 key={"child-box"}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
+                initial={{scale: 0}}
+                animate={{scale: 1}}
+                exit={{scale: 0, opacity: 0}}
                 className="text"
               >
                 <motion.h2
-                  initial={{ scale: 0, y: 100 }}
+                  initial={{scale: 0, y: 100}}
                   animate={{
                     scale: 1,
                     y: 0,
                     transition: {
-                      y: { delay: 0.7 },
+                      y: {delay: 0.7},
                       duration: 0.7,
                     },
                   }}
@@ -500,7 +500,7 @@ const GameId = ({ params }: { params: any }) => {
                   {winner === "x | o" ? "No Winner :/" : "Win !! :)"}
                 </motion.h2>
                 <motion.div
-                  initial={{ scale: 0 }}
+                  initial={{scale: 0}}
                   animate={{
                     scale: 1,
                     transition: {
@@ -522,10 +522,10 @@ const GameId = ({ params }: { params: any }) => {
                   )}
                 </motion.div>
                 <motion.div
-                  initial={{ scale: 0 }}
+                  initial={{scale: 0}}
                   animate={{
                     scale: 1,
-                    transition: { delay: 1.5, duration: 0.3 },
+                    transition: {delay: 1.5, duration: 0.3},
                   }}
                 >
                   <button onClick={() => resetGame()}>New Game</button>
@@ -537,7 +537,7 @@ const GameId = ({ params }: { params: any }) => {
       </div>
     </div>
   );
-}
+};
 
 // };
 
