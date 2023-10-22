@@ -199,7 +199,7 @@ export default function Dashboard() {
       try {
         const stmt = db
           .prepare(
-            "SELECT * FROM tictactoegames_11155111_152 WHERE player2 IS NOT NULL ORDER BY id DESC LIMIT 5;"
+            "SELECT * FROM tictactoegames_11155111_152 ORDER BY id DESC LIMIT 5;"
           )
           .bind();
         const data = await stmt.all();
@@ -308,16 +308,25 @@ export default function Dashboard() {
                       <Button disabled size={"sm"} className="w-full">
                         Game Full
                       </Button>
-                    ) : (
+                    ) : !loadingStates[idx] ? (
                       <Button
                         onClick={() => {
+                          setLoadingStates((prevStates) => {
+                            prevStates[idx] = true; // Set loading state for this button
+                            return [...prevStates];
+                          });
                           handleSubmit(data.id, idx);
                           handleSubmit(data.id, idx);
                         }}
-                        size={"sm"}
+                        size="sm"
                         className="w-full"
                       >
-                        Join Game
+                        Join left Game
+                      </Button>
+                    ) : (
+                      <Button disabled size="sm" className="w-full">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Joining...
                       </Button>
                     )}
                   </CardFooter>

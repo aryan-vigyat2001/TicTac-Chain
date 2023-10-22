@@ -21,10 +21,9 @@ import {
   CeloAlfajoresTestnet,
 } from "@thirdweb-dev/chains";
 import DBContextProvider, {DBContext} from "@/context/DBContext";
-import useDB from "@/hooks/useDB";
 
 export function ThemeProvider({children, ...props}: ThemeProviderProps) {
-  const {globalChain, setGlobalChain} = useDB();
+  const {globalChain, setGlobalChain} = useContext(DBContext);
   const [arr, setArr] = useState([AvalancheFuji, Mumbai]);
 
   useEffect(() => {

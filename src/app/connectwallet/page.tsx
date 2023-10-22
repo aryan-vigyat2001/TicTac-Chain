@@ -89,7 +89,11 @@ export default function ConnectWalletComponent() {
       <div className="text-center p-5 h-[10%] w-screen flex flex-col space-y-2">
         <p className="text-lg font-bold">
           Chain:{" "}
-          {globalChain === "avalanche-fuji" ? "Avalanche Fuji" : globalChain}
+          {globalChain === "avalanche-fuji"
+            ? "Avalanche Fuji"
+            : globalChain === "mumbai"
+            ? "Polygon Mumbai"
+            : globalChain}
         </p>
         {address && <p className="text-center text-sm">Address: {address}</p>}
       </div>
